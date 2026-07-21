@@ -12,7 +12,7 @@ check the box, commit as `loop(step1-build): iteration <N> — <title>`.
 - [x] 3. Pseudo-legal move generation for all pieces — pawns (push/double/diagonal captures,
       en passant targets, promotion flags), knights, sliders (bishop/rook/queen), king (1 step).
       Tests: known move counts from the starting position (20 white moves) and crafted positions.
-- [ ] 4. Legality + check — attack detection, filter pseudo-legal moves that leave own king in
+- [x] 4. Legality + check — attack detection, filter pseudo-legal moves that leave own king in
       check, `applyMove` (mutating captures, en passant capture, promotion, history, captured
       list), `status()` returning ongoing/check/checkmate/stalemate/draw-material.
       Tests: pinned piece can't move, fool's mate is checkmate, stalemate position, K vs K draw.

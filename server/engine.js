@@ -172,3 +172,145 @@ export function findKing(state, color) {
   }
   return null;
 }
+
+// --- Check detection --------------------------------------------------------
+
+export function isAttacked(state, r, c, byColor) {
+  // In 'attacks' mode every generated move is capture-capable on its target.
+  return allPseudoMoves(state, byColor, 'attacks').some((m) => m.to.r === r && m.to.c === c);
+}
+
+export function inCheck(state, color) {
+  const king = findKing(state, color);
+  if (!king) return false;
+  return isAttacked(state, king.r, king.c, color === 'w' ? 'b' : 'w');
+}
+
+// --- Applying moves ---------------------------------------------------------
+
+const ROOK_HOMES = { 'a1': ['w', 'q'], 'h1': ['w', 'k'], 'a8': ['b', 'q'], 'h8': ['b', 'k'] };
+
+function updateCastlingRights(state, piece, fromSq, toSq) {
+  if (piece.type === 'k') {
+    state.castling[piece.color].k = false;
+    state.castling[piece.color].q = false;
+  }
+  for (const s of [fromSq, toSq]) {
+    const home = ROOK_HOMES[s];
+    if (home) state.castling[home[0]][home[1]] = false;
+  }
+}
+
+// Mutates `state` (callers pass a clone). Does NOT validate legality.
+export function applyMoveUnchecked(state, move, promotion = 'q') {
+  const { from, to } = move;
+  const piece = state.board[from.r][from.c];
+  const mover = piece.color;
+  let victim = state.board[to.r][to.c];
+
+  if (move.ep) {
+    const vr = from.r; // captured pawn sits beside the origin rank
+    victim = state.board[vr][to.c];
+    state.board[vr][to.c] = null;
+  }
+  if (victim) state.captured[mover].push(victim.type);
+
+  state.board[to.r][to.c] = piece;
+  state.board[from.r][from.c] = null;
+
+  if (move.castle) {
+    const rank = from.r;
+    if (move.castle === 'k') {
+      state.board[rank][5] = state.board[rank][7];
+      state.board[rank][7] = null;
+    } else {
+      state.board[rank][3] = state.board[rank][0];
+      state.board[rank][0] = null;
+    }
+  }
+
+  let promo = '';
+  if (move.promotion) {
+    const type = ['q', 'r', 'b', 'n'].includes(promotion) ? promotion : 'q';
+    state.board[to.r][to.c] = { type, color: mover };
+    promo = type;
+  }
+
+  updateCastlingRights(state, piece, sq(from.r, from.c), sq(to.r, to.c));
+  state.epSquare = move.double ? sq((from.r + to.r) / 2, from.c) : null;
+  state.history.push(sq(from.r, from.c) + sq(to.r, to.c) + promo);
+  state.turn = mover === 'w' ? 'b' : 'w';
+
+  for (const mod of activeMods(state)) {
+    if (mod.afterApply) mod.afterApply(state, move, mover);
+  }
+  return state;
+}
+
+function isLegal(state, move, mover) {
+  const next = applyMoveUnchecked(clone(state), move);
+  // Own king must survive (rule mods can remove pieces) and not be in check.
+  return findKing(next, mover) !== null && !inCheck(next, mover);
+}
+
+export function legalMovesAt(state, r, c) {
+  const piece = state.board[r][c];
+  if (!piece || piece.color !== state.turn) return [];
+  return pseudoMoves(state, r, c).filter((m) => isLegal(state, m, piece.color));
+}
+
+export function allLegalMoves(state) {
+  const out = [];
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const p = state.board[r][c];
+      if (p && p.color === state.turn) out.push(...legalMovesAt(state, r, c));
+    }
+  }
+  return out;
+}
+
+// Public entry: apply a move given as squares. Returns a NEW state or throws.
+export function applyMove(state, fromSq, toSq, promotion) {
+  const from = coords(fromSq);
+  const piece = state.board[from.r]?.[from.c];
+  if (!piece) throw new Error(`no piece on ${fromSq}`);
+  if (piece.color !== state.turn) throw new Error(`it is ${state.turn === 'w' ? 'white' : 'black'}'s turn`);
+  const move = legalMovesAt(state, from.r, from.c).find(
+    (m) => sq(m.to.r, m.to.c) === toSq
+  );
+  if (!move) throw new Error(`illegal move ${fromSq}${toSq}`);
+  return applyMoveUnchecked(clone(state), move, promotion);
+}
+
+// --- Game status ------------------------------------------------------------
+
+function insufficientMaterial(state) {
+  const minor = [];
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const p = state.board[r][c];
+      if (!p || p.type === 'k') continue;
+      if (p.type === 'b' || p.type === 'n') minor.push(p);
+      else return false;
+    }
+  }
+  return minor.length <= 1;
+}
+
+export function status(state) {
+  const other = state.turn === 'w' ? 'b' : 'w';
+  if (!findKing(state, state.turn)) {
+    return { over: true, check: false, winner: other, reason: 'king-exploded' };
+  }
+  const check = inCheck(state, state.turn);
+  if (allLegalMoves(state).length === 0) {
+    return check
+      ? { over: true, check: true, winner: other, reason: 'checkmate' }
+      : { over: true, check: false, winner: null, reason: 'stalemate' };
+  }
+  if (insufficientMaterial(state)) {
+    return { over: true, check: false, winner: null, reason: 'insufficient-material' };
+  }
+  return { over: false, check, winner: null, reason: null };
+}
