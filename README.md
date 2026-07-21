@@ -7,6 +7,13 @@ and the server-side rules engine recomputes legality, check, and mate under *you
 Built for the CMU DevOps course loop-engineering assignment using an AI assistant driven by an
 iterative agent loop (specify → plan → build-loop, twice: base system then extension).
 
+![demo](demo.gif)
+
+*Demo: fool's mate in plain chess, then a forged game (Royal Knights + Wormholes + Atomic
+Captures) — watch the opening pawn ride the e4→d5 wormhole and the c7 capture vaporize black's
+queenside. Recorded headlessly with [scripts/record-demo.mjs](scripts/record-demo.mjs)
+(`npm start`, then `node scripts/record-demo.mjs` + ffmpeg).*
+
 - **Backend:** Node.js + Express, custom chess engine (no chess libraries), server-authoritative.
 - **Frontend:** Vanilla HTML/CSS/JS single-page app.
 - **Persistence:** In-memory game store (no database required to run — TA-friendly).

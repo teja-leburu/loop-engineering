@@ -91,3 +91,11 @@ Prompt: "Write running.md (how a TA runs it) and reflection.md (one paragraph
 on a software-engineering lesson from loop engineering). Verify npm test is
 green, do a final end-to-end pass in the browser, record demo.gif, push to
 https://github.com/teja-leburu/loop-engineering.git."
+
+(Demo note: the Claude-in-Chrome extension was not connected on this machine,
+so the agent recorded the demo headlessly instead — it wrote
+scripts/record-demo.mjs, which drives the real app in headless Chrome via
+puppeteer-core, plays fool's mate in plain chess, forges a variant with
+royal-knights + wormholes + atomic-captures, rides the wormhole, triggers the
+atomic blast, and screenshots every step; frames were assembled into demo.gif
+with ffmpeg.)
