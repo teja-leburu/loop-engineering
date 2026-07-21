@@ -1,0 +1,15 @@
+{
+  "name": "chess-forge",
+  "version": "1.0.0",
+  "description": "Futuristic chess where you forge your own rule variants",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test server/"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

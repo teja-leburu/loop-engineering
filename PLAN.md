@@ -3,7 +3,7 @@
 Rules for the loop: take the FIRST unchecked task, implement it, make `npm test` green,
 check the box, commit as `loop(step1-build): iteration <N> — <title>`.
 
-- [ ] 1. Project scaffold — `package.json` (express dep, `start`/`test` scripts, node:test),
+- [x] 1. Project scaffold — `package.json` (express dep, `start`/`test` scripts, node:test),
       `server/index.js` Express app serving `public/` + `GET /api/health`, placeholder
       `public/index.html`. Test: API test boots server, health returns ok.
 - [ ] 2. Board core — `server/engine.js`: state shape (8×8 board array, turn, castling rights,
