@@ -62,6 +62,46 @@ test('illegal move returns 400 with reason; unknown game 404', async () => {
   });
 });
 
+test('rules catalog lists the five modifiers', async () => {
+  await withServer(async (api) => {
+    const res = await api('GET', '/api/rules');
+    assert.equal(res.status, 200);
+    assert.deepEqual(
+      res.body.rules.map((r) => r.id).sort(),
+      ['atomic-captures', 'berserker-pawns', 'king-dash', 'royal-knights', 'wormholes']
+    );
+    for (const r of res.body.rules) {
+      assert.ok(r.name && r.description && r.emoji, `catalog entry ${r.id} incomplete`);
+    }
+  });
+});
+
+test('forged game echoes its rules; unknown rule ids rejected', async () => {
+  await withServer(async (api) => {
+    const forged = await api('POST', '/api/games', { rules: ['wormholes', 'atomic-captures'] });
+    assert.equal(forged.status, 201);
+    assert.deepEqual(forged.body.rules, ['wormholes', 'atomic-captures']);
+    const bad = await api('POST', '/api/games', { rules: ['time-travel'] });
+    assert.equal(bad.status, 400);
+    assert.match(bad.body.error, /unknown rule/);
+  });
+});
+
+test('HTTP game with royal-knights: knight king-step appears in /moves and plays', async () => {
+  await withServer(async (api) => {
+    const { body: game } = await api('POST', '/api/games', { rules: ['royal-knights'] });
+    await api('POST', `/api/games/${game.id}/move`, { from: 'a2', to: 'a4' });
+    await api('POST', `/api/games/${game.id}/move`, { from: 'e7', to: 'e5' });
+    // a2 is now vacant: the b1 knight can king-step there only under royal-knights.
+    const moves = await api('GET', `/api/games/${game.id}/moves?from=b1`);
+    const tos = moves.body.moves.map((m) => m.to).sort();
+    assert.deepEqual(tos, ['a2', 'a3', 'c3']); // a2 = king-step; a3/c3 = normal L-moves
+    const played = await api('POST', `/api/games/${game.id}/move`, { from: 'b1', to: 'a2' });
+    assert.equal(played.status, 200);
+    assert.deepEqual(played.body.board[1][0], { type: 'n', color: 'w' });
+  });
+});
+
 test("full API game: scholar's mate ends in checkmate", async () => {
   await withServer(async (api) => {
     const { body: game } = await api('POST', '/api/games', {});

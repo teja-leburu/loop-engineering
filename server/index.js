@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { newGame, applyMove, legalMovesAt, status, coords, sq } from './engine.js';
+import { CATALOG } from './rules.js'; // also registers all rule modifiers
 import { createGame, getGame, setGame } from './store.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,8 +26,14 @@ export function createApp() {
 
   app.get('/api/health', (req, res) => res.json({ ok: true }));
 
+  app.get('/api/rules', (req, res) => res.json({ rules: CATALOG }));
+
   app.post('/api/games', (req, res) => {
     const rules = Array.isArray(req.body?.rules) ? req.body.rules : [];
+    const unknown = rules.filter((id) => !CATALOG.some((r) => r.id === id));
+    if (unknown.length) {
+      return res.status(400).json({ error: `unknown rule ids: ${unknown.join(', ')}` });
+    }
     const state = newGame(rules);
     const id = createGame(state);
     res.status(201).json(view(id, state));

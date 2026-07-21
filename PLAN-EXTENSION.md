@@ -13,7 +13,7 @@ check the box, commit as `loop(step2-build): iteration <N> — <title>`.
       blast clears non-pawns in 3×3 but spares pawns and the capturer, own-king-explosion is
       illegal, enemy-king explosion ends the game (`king-exploded`), wormhole+atomic combo
       detonates at the teleport exit, all-five-modifiers combination game plays.
-- [ ] 3. API surface — `GET /api/rules` catalog endpoint; validate rule ids on game creation
+- [x] 3. API surface — `GET /api/rules` catalog endpoint; validate rule ids on game creation
       (400 on unknown). Tests: catalog lists 5 modifiers; forged game echoes its rules; unknown
       id rejected; HTTP game with royal-knights shows a knight king-step move in /moves.
 - [ ] 4. Forge frontend — Forge panel with toggle cards (rendered from /api/rules), "Forge New
