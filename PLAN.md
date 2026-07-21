@@ -6,7 +6,7 @@ check the box, commit as `loop(step1-build): iteration <N> — <title>`.
 - [x] 1. Project scaffold — `package.json` (express dep, `start`/`test` scripts, node:test),
       `server/index.js` Express app serving `public/` + `GET /api/health`, placeholder
       `public/index.html`. Test: API test boots server, health returns ok.
-- [ ] 2. Board core — `server/engine.js`: state shape (8×8 board array, turn, castling rights,
+- [x] 2. Board core — `server/engine.js`: state shape (8×8 board array, turn, castling rights,
       en-passant square, history, captured), `newGame()`, square<->coords helpers, piece-set
       constants. Tests: starting position layout, turn is white.
 - [ ] 3. Pseudo-legal move generation for all pieces — pawns (push/double/diagonal captures,
