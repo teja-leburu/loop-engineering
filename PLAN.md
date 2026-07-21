@@ -19,7 +19,7 @@ check the box, commit as `loop(step1-build): iteration <N> — <title>`.
 - [x] 5. Castling — rights tracking on king/rook moves & rook capture, both sides both colors,
       blocked/through-check rejection, rook relocation on apply. Tests: legal castle both sides,
       each rejection reason.
-- [ ] 6. REST API — `POST /api/games`, `GET /api/games/:id`, `GET /api/games/:id/moves?from=`,
+- [x] 6. REST API — `POST /api/games`, `GET /api/games/:id`, `GET /api/games/:id/moves?from=`,
       `POST /api/games/:id/move` with 400 + reason on illegal, in-memory `server/store.js`.
       Tests: full API game — scholar's mate via HTTP ends in checkmate status.
 - [ ] 7. Frontend board — `public/` neon-themed board rendering from `GET state`, click piece →
