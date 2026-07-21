@@ -9,7 +9,7 @@ check the box, commit as `loop(step1-build): iteration <N> — <title>`.
 - [x] 2. Board core — `server/engine.js`: state shape (8×8 board array, turn, castling rights,
       en-passant square, history, captured), `newGame()`, square<->coords helpers, piece-set
       constants. Tests: starting position layout, turn is white.
-- [ ] 3. Pseudo-legal move generation for all pieces — pawns (push/double/diagonal captures,
+- [x] 3. Pseudo-legal move generation for all pieces — pawns (push/double/diagonal captures,
       en passant targets, promotion flags), knights, sliders (bishop/rook/queen), king (1 step).
       Tests: known move counts from the starting position (20 white moves) and crafted positions.
 - [ ] 4. Legality + check — attack detection, filter pseudo-legal moves that leave own king in
