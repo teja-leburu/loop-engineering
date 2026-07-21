@@ -8,7 +8,7 @@ check the box, commit as `loop(step2-build): iteration <N> — <title>`.
       Tests: extra moves exist and capture; royal knight delivers king-step check; berserker
       pawn forward-capture threatens check; dash blocked by occupied intermediate; none of the
       extra moves may leave own king in check.
-- [ ] 2. Side-effect modifiers — `wormholes` and `atomic-captures` via `afterApply` inside the
+- [x] 2. Side-effect modifiers — `wormholes` and `atomic-captures` via `afterApply` inside the
       engine's apply pipeline. Tests: teleport on landing (incl. occupied-exit stays), atomic
       blast clears non-pawns in 3×3 but spares pawns and the capturer, own-king-explosion is
       illegal, enemy-king explosion ends the game (`king-exploded`), wormhole+atomic combo

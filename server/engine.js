@@ -53,7 +53,10 @@ export function clone(state) {
 export const MODS = {};
 
 export function activeMods(state) {
-  return (state.rules || []).map((id) => MODS[id]).filter(Boolean);
+  return (state.rules || [])
+    .map((id) => MODS[id])
+    .filter(Boolean)
+    .sort((a, b) => (a.priority || 0) - (b.priority || 0)); // e.g. teleport resolves before detonation
 }
 
 // --- Move generation --------------------------------------------------------
@@ -227,6 +230,7 @@ function updateCastlingRights(state, piece, fromSq, toSq) {
 
 // Mutates `state` (callers pass a clone). Does NOT validate legality.
 export function applyMoveUnchecked(state, move, promotion = 'q') {
+  move = { ...move }; // isolate rule-mod annotations (e.g. _finalTo) from legality simulations
   const { from, to } = move;
   const piece = state.board[from.r][from.c];
   const mover = piece.color;

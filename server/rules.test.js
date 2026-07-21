@@ -74,6 +74,99 @@ test('extra moves still respect check (pinned royal knight stays on the file)', 
   assert.ok(legal.every((t) => t[0] === 'e'), `moves off the pin file: ${legal}`);
 });
 
+test('wormholes: landing on a portal teleports to its pair', () => {
+  const s = emptyGame({
+    a4: { type: 'r', color: 'w' }, a1: { type: 'k', color: 'w' }, h8: { type: 'k', color: 'b' },
+  });
+  s.rules = ['wormholes'];
+  const next = applyMove(s, 'a4', 'd4');
+  assert.equal(pieceAt(next, 'd4'), null);
+  assert.deepEqual(pieceAt(next, 'e5'), { type: 'r', color: 'w' });
+});
+
+test('wormholes: occupied exit means no teleport', () => {
+  const s = emptyGame({
+    a4: { type: 'r', color: 'w' },
+    e5: { type: 'p', color: 'w' }, // blocks the d4→e5 exit
+    a1: { type: 'k', color: 'w' },
+    h8: { type: 'k', color: 'b' },
+  });
+  s.rules = ['wormholes'];
+  const next = applyMove(s, 'a4', 'd4');
+  assert.deepEqual(pieceAt(next, 'd4'), { type: 'r', color: 'w' });
+});
+
+test('atomic-captures: blast clears adjacent non-pawns, spares pawns and the capturer', () => {
+  const s = emptyGame({
+    d1: { type: 'r', color: 'w' },
+    d5: { type: 'n', color: 'b' }, // victim
+    c6: { type: 'b', color: 'b' }, // adjacent bishop — vaporized
+    d6: { type: 'p', color: 'b' }, // adjacent pawn — spared
+    e6: { type: 'n', color: 'w' }, // own knight in blast radius — vaporized too
+    a1: { type: 'k', color: 'w' },
+    h8: { type: 'k', color: 'b' },
+  });
+  s.rules = ['atomic-captures'];
+  const next = applyMove(s, 'd1', 'd5');
+  assert.deepEqual(pieceAt(next, 'd5'), { type: 'r', color: 'w' });
+  assert.equal(pieceAt(next, 'c6'), null);
+  assert.deepEqual(pieceAt(next, 'd6'), { type: 'p', color: 'b' });
+  assert.equal(pieceAt(next, 'e6'), null);
+  assert.deepEqual(next.captured.w.sort(), ['b', 'n']); // black knight + bishop
+  assert.deepEqual(next.captured.b, ['n']); // white's own knight, lost to the blast
+});
+
+test('atomic-captures: exploding your own king is illegal', () => {
+  const s = emptyGame({
+    d1: { type: 'r', color: 'w' },
+    d5: { type: 'n', color: 'b' },
+    d6: { type: 'k', color: 'w' }, // own king adjacent to ground zero
+    h8: { type: 'k', color: 'b' },
+  });
+  s.rules = ['atomic-captures'];
+  assert.throws(() => applyMove(s, 'd1', 'd5'), /illegal/);
+});
+
+test('atomic-captures: vaporizing the enemy king wins', () => {
+  const s = emptyGame({
+    d1: { type: 'r', color: 'w' },
+    d5: { type: 'n', color: 'b' },
+    c6: { type: 'k', color: 'b' }, // enemy king adjacent to ground zero
+    a1: { type: 'k', color: 'w' },
+  });
+  s.rules = ['atomic-captures'];
+  const next = applyMove(s, 'd1', 'd5');
+  const st = status(next);
+  assert.deepEqual({ over: st.over, winner: st.winner, reason: st.reason },
+    { over: true, winner: 'w', reason: 'king-exploded' });
+});
+
+test('combo: atomic capture on a portal detonates at the teleport EXIT (any rules order)', () => {
+  const s = emptyGame({
+    e1: { type: 'r', color: 'w' },
+    e4: { type: 'n', color: 'b' }, // victim on a portal square (e4→d5)
+    c6: { type: 'b', color: 'b' }, // adjacent to d5 exit — should be vaporized
+    f3: { type: 'q', color: 'b' }, // adjacent to e4 entry only — should SURVIVE
+    a1: { type: 'k', color: 'w' },
+    h8: { type: 'k', color: 'b' },
+  });
+  s.rules = ['atomic-captures', 'wormholes']; // deliberately "wrong" order — priority must fix it
+  const next = applyMove(s, 'e1', 'e4');
+  assert.deepEqual(pieceAt(next, 'd5'), { type: 'r', color: 'w' }); // teleported
+  assert.equal(pieceAt(next, 'c6'), null); // blast at exit
+  assert.deepEqual(pieceAt(next, 'f3'), { type: 'q', color: 'b' }); // entry untouched
+});
+
+test('all five modifiers active: opening double-push rides the wormhole', () => {
+  const ids = ['royal-knights', 'berserker-pawns', 'wormholes', 'atomic-captures', 'king-dash'];
+  let s = newGame(ids);
+  s = applyMove(s, 'e2', 'e4'); // lands on the e4 portal → exits at d5
+  assert.equal(pieceAt(s, 'e4'), null);
+  assert.deepEqual(pieceAt(s, 'd5'), { type: 'p', color: 'w' });
+  s = applyMove(s, 'g8', 'f6');
+  assert.equal(status(s).over, false);
+});
+
 test('modifiers only apply when their rule id is active', () => {
   const plain = emptyGame({ d4: { type: 'n', color: 'w' } });
   assert.equal(at(plain, 'd4').length, 8);

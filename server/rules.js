@@ -1,6 +1,6 @@
 // The Rule Forge — composable rule modifiers. Importing this module registers
 // every modifier into the engine's MODS registry (engine consults state.rules).
-import { MODS, onBoard, sq, findKing } from './engine.js';
+import { MODS, onBoard, sq, coords } from './engine.js';
 
 const AROUND = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
 
@@ -74,6 +74,39 @@ MODS['berserker-pawns'] = {
       return [m];
     }
     return [];
+  },
+};
+
+export const PORTALS = { d4: 'e5', e5: 'd4', e4: 'd5', d5: 'e4' };
+
+MODS['wormholes'] = {
+  priority: 1, // resolve teleport before anything that cares about the landing square
+  afterApply(state, move) {
+    const cur = move._finalTo || move.to;
+    const exit = PORTALS[sq(cur.r, cur.c)];
+    if (!exit) return;
+    const { r, c } = coords(exit);
+    if (state.board[r][c]) return; // occupied exit: portal fizzles, piece stays
+    state.board[r][c] = state.board[cur.r][cur.c];
+    state.board[cur.r][cur.c] = null;
+    move._finalTo = { r, c };
+  },
+};
+
+MODS['atomic-captures'] = {
+  priority: 2, // detonate at the final landing square (post-teleport)
+  afterApply(state, move, mover) {
+    if (!move.capture) return;
+    const cur = move._finalTo || move.to;
+    for (const [dr, dc] of AROUND) {
+      const r = cur.r + dr, c = cur.c + dc;
+      if (!onBoard(r, c)) continue;
+      const p = state.board[r][c];
+      if (p && p.type !== 'p') {
+        state.board[r][c] = null;
+        state.captured[p.color === 'w' ? 'b' : 'w'].push(p.type);
+      }
+    }
   },
 };
 
