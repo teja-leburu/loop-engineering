@@ -133,6 +133,27 @@ function pawnMoves(state, r, c, piece, mode) {
   return out;
 }
 
+function castleMoves(state, r, c, piece) {
+  const out = [];
+  const home = piece.color === 'w' ? 0 : 7;
+  if (r !== home || c !== 4) return out;
+  const enemy = piece.color === 'w' ? 'b' : 'w';
+  const rights = state.castling[piece.color];
+  const rookAt = (col) => {
+    const p = state.board[home][col];
+    return p && p.type === 'r' && p.color === piece.color;
+  };
+  const empty = (...cols) => cols.every((col) => !state.board[home][col]);
+  const safe = (...cols) => cols.every((col) => !isAttacked(state, home, col, enemy));
+  if (rights.k && rookAt(7) && empty(5, 6) && safe(4, 5, 6)) {
+    out.push({ from: { r, c }, to: { r: home, c: 6 }, capture: false, castle: 'k' });
+  }
+  if (rights.q && rookAt(0) && empty(1, 2, 3) && safe(4, 3, 2)) {
+    out.push({ from: { r, c }, to: { r: home, c: 2 }, capture: false, castle: 'q' });
+  }
+  return out;
+}
+
 export function pseudoMoves(state, r, c, mode = 'moves') {
   const piece = state.board[r][c];
   if (!piece) return [];
@@ -143,7 +164,10 @@ export function pseudoMoves(state, r, c, mode = 'moves') {
     case 'b': out = slideMoves(state, r, c, piece, BISHOP_D); break;
     case 'r': out = slideMoves(state, r, c, piece, ROOK_D); break;
     case 'q': out = slideMoves(state, r, c, piece, [...ROOK_D, ...BISHOP_D]); break;
-    case 'k': out = stepMoves(state, r, c, piece, KING_D); break;
+    case 'k':
+      out = stepMoves(state, r, c, piece, KING_D);
+      if (mode === 'moves') out.push(...castleMoves(state, r, c, piece));
+      break;
     default: out = [];
   }
   for (const mod of activeMods(state)) {

@@ -16,7 +16,7 @@ check the box, commit as `loop(step1-build): iteration <N> — <title>`.
       check, `applyMove` (mutating captures, en passant capture, promotion, history, captured
       list), `status()` returning ongoing/check/checkmate/stalemate/draw-material.
       Tests: pinned piece can't move, fool's mate is checkmate, stalemate position, K vs K draw.
-- [ ] 5. Castling — rights tracking on king/rook moves & rook capture, both sides both colors,
+- [x] 5. Castling — rights tracking on king/rook moves & rook capture, both sides both colors,
       blocked/through-check rejection, rook relocation on apply. Tests: legal castle both sides,
       each rejection reason.
 - [ ] 6. REST API — `POST /api/games`, `GET /api/games/:id`, `GET /api/games/:id/moves?from=`,

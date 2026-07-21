@@ -137,6 +137,61 @@ test('promotion: pawn becomes chosen piece', () => {
   assert.equal(s.history.at(-1), 'g7g8n');
 });
 
+function castlePosition(turn = 'w') {
+  const s = emptyGame({
+    e1: { type: 'k', color: 'w' },
+    a1: { type: 'r', color: 'w' },
+    h1: { type: 'r', color: 'w' },
+    e8: { type: 'k', color: 'b' },
+    a8: { type: 'r', color: 'b' },
+    h8: { type: 'r', color: 'b' },
+  }, turn);
+  s.castling = { w: { k: true, q: true }, b: { k: true, q: true } };
+  return s;
+}
+
+test('castling: kingside white relocates king and rook', () => {
+  const s = applyMove(castlePosition('w'), 'e1', 'g1');
+  assert.deepEqual(pieceAt(s, 'g1'), { type: 'k', color: 'w' });
+  assert.deepEqual(pieceAt(s, 'f1'), { type: 'r', color: 'w' });
+  assert.equal(pieceAt(s, 'h1'), null);
+  assert.deepEqual(s.castling.w, { k: false, q: false });
+});
+
+test('castling: queenside black relocates king and rook', () => {
+  const s = applyMove(castlePosition('b'), 'e8', 'c8');
+  assert.deepEqual(pieceAt(s, 'c8'), { type: 'k', color: 'b' });
+  assert.deepEqual(pieceAt(s, 'd8'), { type: 'r', color: 'b' });
+  assert.equal(pieceAt(s, 'a8'), null);
+});
+
+test('castling rejected when blocked, through check, or in check', () => {
+  const blocked = castlePosition('w');
+  blocked.board[0][5] = { type: 'b', color: 'w' }; // bishop on f1
+  assert.throws(() => applyMove(blocked, 'e1', 'g1'), /illegal/);
+
+  const throughCheck = castlePosition('w');
+  throughCheck.board[4][5] = { type: 'r', color: 'b' }; // black rook on f5 hits f1
+  assert.throws(() => applyMove(throughCheck, 'e1', 'g1'), /illegal/);
+
+  const inCheckPos = castlePosition('w');
+  inCheckPos.board[4][4] = { type: 'r', color: 'b' }; // black rook on e5 hits e1
+  assert.throws(() => applyMove(inCheckPos, 'e1', 'g1'), /illegal/);
+});
+
+test('castling rights lost after king or rook moves', () => {
+  let s = castlePosition('w');
+  s = applyMove(s, 'h1', 'h2'); // rook up
+  s = applyMove(s, 'e8', 'f8'); // black king move loses black rights
+  s = applyMove(s, 'h2', 'h1'); // rook back
+  s = applyMove(s, 'f8', 'e8');
+  assert.deepEqual(s.castling.w, { k: false, q: true });
+  assert.deepEqual(s.castling.b, { k: false, q: false });
+  assert.throws(() => applyMove(s, 'e1', 'g1'), /illegal/);
+  const qs = applyMove(s, 'e1', 'c1'); // queenside still available
+  assert.deepEqual(pieceAt(qs, 'c1'), { type: 'k', color: 'w' });
+});
+
 test('illegal moves throw: wrong turn, illegal destination', () => {
   const s = newGame();
   assert.throws(() => applyMove(s, 'e7', 'e5'), /turn/);
