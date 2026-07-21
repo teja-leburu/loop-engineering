@@ -1,0 +1,93 @@
+================================================================================
+PROMPTS LOG — every command given to the AI agent (Claude Code, model: Fable 5)
+Assignment: loop engineering. Process: 2 steps (base + extension), each in
+3 stages (specify -> plan -> build), build stages driven by an agent loop.
+================================================================================
+
+--------------------------------------------------------------------------------
+[USER PROMPT #0 — kickoff, given to Claude Code]
+--------------------------------------------------------------------------------
+Setup this Git Repo and One Shot this assignment please!
+https://github.com/teja-leburu/loop-engineering.git
+(assignment text pasted: build something nontrivial with an AI assistant and a
+loop; 2 steps, >=3 stages each, loop for at least one stage, commit every stage;
+include prompts.txt, running.md, reflection.md)
+"build a app with a frontend, backend, and maybe redis and postgres to
+futuristic game where you get to make customized chess rules in addition to the
+normal ones if needed! /loop record a demo when done finish it e2e and don't
+stop till the product is fully build"
+
+--------------------------------------------------------------------------------
+[STEP 1 / STAGE 1 — SPECIFY]
+--------------------------------------------------------------------------------
+Prompt: "Write SPEC.md for the base system: a server-authoritative chess web
+app. Node/Express backend with a hand-written chess engine (no chess libraries,
+because step 2 needs to inject custom rule modifiers into move generation),
+vanilla JS frontend with a futuristic neon theme, in-memory game store, REST
+API for create/state/legal-moves/move. Full rules: castling, en passant,
+promotion, check/checkmate/stalemate/insufficient material. Include functional
+requirements, quality requirements (node:test coverage), and acceptance
+criteria a TA can verify."
+
+--------------------------------------------------------------------------------
+[STEP 1 / STAGE 2 — PLAN]
+--------------------------------------------------------------------------------
+Prompt: "Read SPEC.md and produce PLAN.md: an ordered checklist of small,
+independently testable build tasks with '- [ ]' checkboxes. Each task must name
+the files it touches and the tests that prove it. The build loop will execute
+one task per iteration, so tasks must be small and ordered by dependency."
+
+--------------------------------------------------------------------------------
+[STEP 1 / STAGE 3 — BUILD (LOOP)]
+--------------------------------------------------------------------------------
+Loop prompt, given verbatim to the agent EVERY iteration until PLAN.md had no
+unchecked boxes left (ralph-wiggum-style fixed prompt, state lives in the repo):
+
+  "You are in a build loop. Read SPEC.md and PLAN.md. Find the FIRST unchecked
+  '- [ ]' task in PLAN.md. Implement ONLY that task. Run 'npm test' and fix
+  failures until green. Mark the task '- [x]' in PLAN.md. Commit everything
+  with message 'loop(step1-build): iteration <N> — <task title>'. Do not start
+  the next task. If all tasks are checked, output DONE."
+
+(Iterations actually executed are visible in git history as
+ loop(step1-build) commits.)
+
+--------------------------------------------------------------------------------
+[STEP 2 / STAGE 1 — SPECIFY]
+--------------------------------------------------------------------------------
+Prompt: "Write SPEC-EXTENSION.md for the Rule Forge extension: composable rule
+modifiers a player toggles when creating a game — royal-knights (knights also
+step like kings), berserker-pawns (pawns may capture straight ahead),
+wormholes (paired teleport squares in the center), atomic-captures (captures
+explode adjacent non-pawns), king-dash (king may move two squares in a line).
+Modifiers hook into the engine's move generation / post-move pipeline, combine
+freely, and check/checkmate must remain correct under any combination. Frontend
+gets a 'Forge your variant' panel with toggles and visual cues (wormhole glow,
+explosion flash). Include API changes and tests required."
+
+--------------------------------------------------------------------------------
+[STEP 2 / STAGE 2 — PLAN]
+--------------------------------------------------------------------------------
+Prompt: "Read SPEC-EXTENSION.md and produce PLAN-EXTENSION.md: same format as
+PLAN.md — ordered '- [ ]' checklist of small tasks with files and tests, one
+task per build-loop iteration."
+
+--------------------------------------------------------------------------------
+[STEP 2 / STAGE 3 — BUILD (LOOP)]
+--------------------------------------------------------------------------------
+Loop prompt, given verbatim every iteration until PLAN-EXTENSION.md was fully
+checked:
+
+  "You are in a build loop. Read SPEC-EXTENSION.md and PLAN-EXTENSION.md. Find
+  the FIRST unchecked '- [ ]' task in PLAN-EXTENSION.md. Implement ONLY that
+  task. Run 'npm test' and fix failures until green. Mark the task '- [x]'.
+  Commit with message 'loop(step2-build): iteration <N> — <task title>'. If all
+  tasks are checked, output DONE."
+
+--------------------------------------------------------------------------------
+[WRAP-UP]
+--------------------------------------------------------------------------------
+Prompt: "Write running.md (how a TA runs it) and reflection.md (one paragraph
+on a software-engineering lesson from loop engineering). Verify npm test is
+green, do a final end-to-end pass in the browser, record demo.gif, push to
+https://github.com/teja-leburu/loop-engineering.git."
