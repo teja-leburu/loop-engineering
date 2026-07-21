@@ -3,7 +3,7 @@
 Rules for the loop: take the FIRST unchecked task, implement it, make `npm test` green,
 check the box, commit as `loop(step2-build): iteration <N> — <title>`.
 
-- [ ] 1. Movement modifiers — `server/rules.js` with the MODS registry entries + catalog
+- [x] 1. Movement modifiers — `server/rules.js` with the MODS registry entries + catalog
       metadata; implement `royal-knights`, `berserker-pawns`, `king-dash` via `extraMoves`.
       Tests: extra moves exist and capture; royal knight delivers king-step check; berserker
       pawn forward-capture threatens check; dash blocked by occupied intermediate; none of the
