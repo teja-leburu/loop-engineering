@@ -16,6 +16,6 @@ check the box, commit as `loop(step2-build): iteration <N> — <title>`.
 - [x] 3. API surface — `GET /api/rules` catalog endpoint; validate rule ids on game creation
       (400 on unknown). Tests: catalog lists 5 modifiers; forged game echoes its rules; unknown
       id rejected; HTTP game with royal-knights shows a knight king-step move in /moves.
-- [ ] 4. Forge frontend — Forge panel with toggle cards (rendered from /api/rules), "Forge New
+- [x] 4. Forge frontend — Forge panel with toggle cards (rendered from /api/rules), "Forge New
       Game" button, active-rule badges during play, wormhole square glow, atomic explosion
       flash animation. Manual browser test; API already covered.

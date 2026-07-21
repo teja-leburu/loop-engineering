@@ -152,6 +152,68 @@ button:hover { background: var(--neon); color: #041018; box-shadow: 0 0 16px var
 .cap-label { font-size: 0.65rem; color: #5f6f9f; width: 70px; }
 .captured { font-size: 1.3rem; letter-spacing: 2px; min-height: 1.4em; }
 
+.forge-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  margin: 5px 0;
+  border: 1px solid #1e2b52;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0.78rem;
+}
+.forge-toggle:hover { border-color: var(--neon); }
+.forge-toggle.active {
+  border-color: var(--neon2);
+  background: rgba(255, 46, 230, 0.08);
+  box-shadow: 0 0 12px rgba(255, 46, 230, 0.25);
+}
+.forge-toggle .emoji { font-size: 1.1rem; }
+.forge-toggle .desc { display: none; }
+.forge-toggle:hover .desc {
+  display: block;
+  position: absolute;
+  transform: translateY(34px);
+  background: #060a14;
+  border: 1px solid var(--neon);
+  border-radius: 6px;
+  padding: 8px;
+  width: 200px;
+  z-index: 5;
+  font-size: 0.7rem;
+  color: var(--text);
+}
+
+#rule-badges { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 0; }
+.rule-badge {
+  font-size: 0.9rem;
+  border: 1px solid var(--neon2);
+  border-radius: 10px;
+  padding: 2px 7px;
+  box-shadow: 0 0 8px rgba(255, 46, 230, 0.35);
+}
+
+.square.wormhole::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 2px dashed var(--neon);
+  border-radius: 50%;
+  animation: spin 6s linear infinite;
+  box-shadow: 0 0 14px rgba(25, 230, 255, 0.5), inset 0 0 10px rgba(25, 230, 255, 0.3);
+  pointer-events: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.square.explode { animation: explode 0.8s ease-out; }
+@keyframes explode {
+  0% { background: #fff; box-shadow: 0 0 40px 20px var(--gold); }
+  40% { background: var(--neon2); box-shadow: 0 0 30px 10px var(--neon2); }
+  100% { }
+}
+
 dialog {
   background: var(--panel);
   border: 1px solid var(--neon);
