@@ -4,9 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chess Forge ⚡</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Chess Forge ⚡</h1>
-  <p>Board coming soon…</p>
+  <header>
+    <h1>CHESS<span class="accent">FORGE</span> <span class="bolt">⚡</span></h1>
+    <p class="tagline">forge your own rules of war</p>
+  </header>
+
+  <main>
+    <aside id="left-panel" class="panel">
+      <h2>Status</h2>
+      <div id="turn-indicator"></div>
+      <div id="banner"></div>
+      <button id="new-game">⟳ New Game</button>
+      <div id="game-link" class="hint"></div>
+      <h2>Captured</h2>
+      <div class="captured-row"><span class="cap-label">White took</span><span id="captured-w" class="captured"></span></div>
+      <div class="captured-row"><span class="cap-label">Black took</span><span id="captured-b" class="captured"></span></div>
+    </aside>
+
+    <div id="board-wrap">
+      <div id="board"></div>
+    </div>
+
+    <aside id="right-panel" class="panel">
+      <h2>Move history</h2>
+      <ol id="history"></ol>
+    </aside>
+  </main>
+
+  <dialog id="promotion-dialog">
+    <p>Promote to:</p>
+    <div id="promotion-choices"></div>
+  </dialog>
+
+  <script src="app.js"></script>
 </body>
 </html>

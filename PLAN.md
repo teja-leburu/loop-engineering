@@ -22,7 +22,7 @@ check the box, commit as `loop(step1-build): iteration <N> — <title>`.
 - [x] 6. REST API — `POST /api/games`, `GET /api/games/:id`, `GET /api/games/:id/moves?from=`,
       `POST /api/games/:id/move` with 400 + reason on illegal, in-memory `server/store.js`.
       Tests: full API game — scholar's mate via HTTP ends in checkmate status.
-- [ ] 7. Frontend board — `public/` neon-themed board rendering from `GET state`, click piece →
+- [x] 7. Frontend board — `public/` neon-themed board rendering from `GET state`, click piece →
       highlight legal moves (from API), click target → POST move, turn indicator, game id in URL
       hash + New Game button. Manual test in browser; API contract already covered by tests.
 - [ ] 8. Frontend game-flow polish — move history panel, captured pieces trays, check/mate/
