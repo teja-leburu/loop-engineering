@@ -25,5 +25,5 @@ check the box, commit as `loop(step1-build): iteration <N> — <title>`.
 - [x] 7. Frontend board — `public/` neon-themed board rendering from `GET state`, click piece →
       highlight legal moves (from API), click target → POST move, turn indicator, game id in URL
       hash + New Game button. Manual test in browser; API contract already covered by tests.
-- [ ] 8. Frontend game-flow polish — move history panel, captured pieces trays, check/mate/
+- [x] 8. Frontend game-flow polish — move history panel, captured pieces trays, check/mate/
       stalemate banners, promotion picker dialog. Manual test: full game incl. promotion.
